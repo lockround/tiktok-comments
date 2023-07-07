@@ -57,6 +57,7 @@ app.get("/tiktok", async (req, res) => {
       // await page.waitForTimeout(500000)
 
       // console.log(comments);
+      await page.screenshot({ path: "example.png" });
       await browser.close();
       return res.send(comments);
     })
