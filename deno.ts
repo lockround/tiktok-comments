@@ -52,6 +52,7 @@ router.get("/tiktok", async (ctx) => {
       let comment = $(el).text();
       comments[i] = { ...comments[i], comment };
     });
+    console.log(comments);
     ctx.response.body = comments;
     ctx.response.type = "text";
   } finally {
