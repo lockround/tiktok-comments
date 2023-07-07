@@ -32,7 +32,7 @@ app.get("/tiktok", async (req, res) => {
     req.query.url ||
     "https://www.tiktok.com/@eyeinspired/video/7252706573519310122";
   puppeteer
-    .launch({ headless: false })
+    .launch({ headless: "new" })
     .then(async (browser) => {
       const page = await browser.newPage();
       await page.goto(url, { waitUntil: "domcontentloaded" });
