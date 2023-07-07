@@ -10,7 +10,9 @@ if (BROWSERLESS_TOKEN === undefined) {
 const router = new Router();
 
 router.get("/tiktok", async (ctx) => {
-  const rawUrl = ctx.request.url.searchParams.get("url");
+  const rawUrl =
+    ctx.request.url.searchParams.get("url") ||
+    "https://www.tiktok.com/@twinsfromrussia/video/7250965295345503530";
   let url: URL;
   try {
     url = new URL(rawUrl ?? "");
