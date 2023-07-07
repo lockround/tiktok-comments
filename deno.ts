@@ -68,4 +68,4 @@ app.use(router.allowedMethods());
 
 app.addEventListener("error", (err) => console.error(err.message));
 
-export default app;
+addEventListener("fetch", app.fetchEventHandler());
