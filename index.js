@@ -1,19 +1,38 @@
 const puppeteer = require("puppeteer-extra");
+const { DEFAULT_INTERCEPT_RESOLUTION_PRIORITY } = require("puppeteer");
 const cheerio = require("cheerio");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const express = require("express");
+// const PortalPlugin = require('puppeteer-extra-plugin-portal')
 const cors = require("cors");
 
 const app = express();
 app.use(cors());
+puppeteer.use(require("puppeteer-extra-plugin-anonymize-ua")());
 puppeteer.use(StealthPlugin());
+// puppeteer.use(
+//   PortalPlugin({
+//     webPortalConfig: {
+//         // When used as middleware, you'll need to provide the baseUrl if it's anything but `http://localhost:3000`
+//         baseUrl: 'http://localhost:3001',
+//       },
+//   })
+// )
+puppeteer.use(
+  require("puppeteer-extra-plugin-block-resources")({
+    blockedTypes: new Set(["image", "stylesheet"]),
+    // Optionally enable Cooperative Mode for several request interceptors
+    interceptResolutionPriority: DEFAULT_INTERCEPT_RESOLUTION_PRIORITY,
+  })
+);
+
 app.use(express.json());
 app.get("/tiktok", async (req, res) => {
   const url =
     req.query.url ||
     "https://www.tiktok.com/@eyeinspired/video/7252706573519310122";
   puppeteer
-    .launch({ headless: "new" })
+    .launch({ headless: false })
     .then(async (browser) => {
       const page = await browser.newPage();
       await page.goto(url, { waitUntil: "domcontentloaded" });
@@ -23,7 +42,7 @@ app.get("/tiktok", async (req, res) => {
         () => document.querySelector("*").outerHTML
       );
       let $ = cheerio.load(data);
-      if ($("[data-e2e=modal-close-inner-button]")) {
+      if ($("[data-e2e=modal-close-inner-button]").length > 0) {
         await page.click("[data-e2e=modal-close-inner-button]");
       }
       let comments = {};
@@ -42,6 +61,7 @@ app.get("/tiktok", async (req, res) => {
       return res.send(comments);
     })
     .catch((err) => {
+      console.log(err);
       return res.send("error occured");
     });
 });
